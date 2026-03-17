@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Автобусен Календар</title>
+    <style>
+        /* Основен стил за страницата */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+        }
+
+        /* Стил за картите на автомобилите */
+        .car-card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            padding: 20px;
+        }
+
+        .car-card h2 {
+            margin-top: 0;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+            color: #34495e;
+        }
+
+        /* Стил за отделните събития */
+        .event {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            font-weight: bold;
+        }
+
+        /* Цветове за статусите */
+        .safe {
+            background-color: #d4edda;
+            color: #155724;
+            border-left: 5px solid #28a745;
+        }
+
+        .warning {
+            background-color: #fff3cd;
+            color: #856404;
+            border-left: 5px solid #ffc107;
+        }
+
+        .danger {
+            background-color: #f8d7da;
+            color: #721c24;
+            border-left: 5px solid #dc3545;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>📅 Преглед на събития за автобусите</h1>
+    
+    <div id="cars-container"></div>
+
+    <script>
+        // 1. ТУК ВЪВЕЖДАШ ДАННИТЕ ЗА АВТОМОБИЛИТЕ
+        // Формат на датата: "ГГГГ-ММ-ДД" (Година-Месец-Ден)
+        const carsData = [
+            {
+                name: "VDL Futura",
+                events: [
+                    { title: "Гражданска отговорност (ГО)", date: "2026-04-15" },
+                    { title: "Годишен технически преглед (ГТП)", date: "2026-03-25" }, // Пример за наближаващо
+                    { title: "Договор за GPS И TOLL", date: "2026-08-10" },
+                    { title: "Лиценз за превоз", date: "2026-08-10" },
+                    { title: "Заверка на тахограф", date: "2026-08-10" },
+                    { title: "Заверка на пожарогасители", date: "2026-08-10" }
+                ]
+            },
+            {
+                name: "MAN",
+                events: [
+                    { title: "Гражданска отговорност (ГО)", date: "2026-02-10" }, // Пример за изтекло
+                    { title: "Годишен технически преглед (ГТП)", date: "2026-11-20" },
+                    { title: "Договор за GPS И TOLL", date: "2027-01-05" },
+                    { title: "Лиценз за превоз", date: "2026-08-10" },
+                    { title: "Заверка на тахограф", date: "2026-08-10" },
+                    { title: "Заверка на пожарогасители", date: "2026-08-10" }
+                ]
+            },
+            {
+                name: "Mercedes Sprinter",
+                events: [
+                    { title: "Гражданска отговорност (ГО)", date: "2026-06-30" },
+                    { title: "Годишен технически преглед (ГТП)", date: "2026-07-15" },
+                    { title: "Договор за GPS И TOLL", date: "2026-05-01" },
+                    { title: "Лиценз за превоз", date: "2026-08-10" },
+                    { title: "Заверка на тахограф", date: "2026-08-10" },
+                    { title: "Заверка на пожарогасители", date: "2026-08-10" }
+                ]
+            }
+        ];
+
+        // 2. Логика за визуализация и пресмятане на дните
+        const container = document.getElementById('cars-container');
+        
+        // Взимаме днешната дата и нулираме часовете, за да смятаме само точни дни
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        // Обхождаме всеки автомобил
+        carsData.forEach(car => {
+            // Създаваме HTML елемент за картата на колата
+            const carDiv = document.createElement('div');
+            carDiv.className = 'car-card';
+            carDiv.innerHTML = `<h2>🚌 ${car.name}</h2>`;
+
+            // Обхождаме всяко събитие за конкретната кола
+            car.events.forEach(event => {
+                const eventDate = new Date(event.date);
+                
+                // Пресмятаме разликата в дни
+                const diffTime = eventDate - today;
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                // Определяме статуса (цвета) и текста
+                let statusClass = 'safe';
+                let statusText = `Остават ${diffDays} дни`;
+
+                if (diffDays < 0) {
+                    statusClass = 'danger';
+                    statusText = `Изтекло преди ${Math.abs(diffDays)} дни!`;
+                } else if (diffDays === 0) {
+                    statusClass = 'danger';
+                    statusText = 'Изтича ДНЕС!';
+                } else if (diffDays <= 14) {
+                    statusClass = 'warning';
+                }
+
+                // Форматираме датата за показване (от ГГГГ-ММ-ДД към ДД.ММ.ГГГГ)
+                const displayDate = eventDate.toLocaleDateString('bg-BG');
+
+                // Добавяме събитието към картата на колата
+                carDiv.innerHTML += `
+                    <div class="event ${statusClass}">
+                        <span><strong>${event.title}</strong> (${displayDate})</span>
+                        <span>${statusText}</span>
+                    </div>
+                `;
+            });
+
+            // Добавяме готовата карта към главния контейнер в страницата
+            container.appendChild(carDiv);
+        });
+    </script>
+</body>
+</html>
