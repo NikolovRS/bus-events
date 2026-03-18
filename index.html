@@ -3,163 +3,187 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Автобусен Календар</title>
+    <title>Автобусен Календар и Поддръжка</title>
     <style>
-        /* Основен стил за страницата */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #f4f7f6;
             color: #333;
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
             padding: 20px;
         }
 
-        h1 {
-            text-align: center;
-            color: #2c3e50;
-        }
+        h1 { text-align: center; color: #2c3e50; }
 
-        /* Стил за картите на автомобилите */
         .car-card {
             background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            padding: 25px;
+            border-top: 5px solid #3498db;
         }
 
         .car-card h2 {
             margin-top: 0;
-            border-bottom: 2px solid #eee;
-            padding-bottom: 10px;
-            color: #34495e;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
-        /* Стил за отделните събития */
+        h3 {
+            font-size: 1.1em;
+            color: #7f8c8d;
+            margin-top: 20px;
+            border-bottom: 1px dashed #ccc;
+            padding-bottom: 5px;
+        }
+
         .event {
             display: flex;
             justify-content: space-between;
-            padding: 12px;
-            margin-bottom: 10px;
+            padding: 10px;
+            margin-bottom: 5px;
             border-radius: 6px;
+        }
+
+        /* Цветове за изтичащи събития */
+        .safe { background-color: #d4edda; color: #155724; }
+        .warning { background-color: #fff3cd; color: #856404; }
+        .danger { background-color: #f8d7da; color: #721c24; }
+
+        /* Стил за сервизната история и ремонтите */
+        .info-box {
+            background-color: #f9f9f9;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 0.95em;
+            line-height: 1.6;
+        }
+        
+        .repair-item {
+            color: #e67e22; /* Оранжев цвят за предстоящи ремонти */
             font-weight: bold;
-        }
-
-        /* Цветове за статусите */
-        .safe {
-            background-color: #d4edda;
-            color: #155724;
-            border-left: 5px solid #28a745;
-        }
-
-        .warning {
-            background-color: #fff3cd;
-            color: #856404;
-            border-left: 5px solid #ffc107;
-        }
-
-        .danger {
-            background-color: #f8d7da;
-            color: #721c24;
-            border-left: 5px solid #dc3545;
         }
     </style>
 </head>
 <body>
 
-    <h1>📅 Преглед на събития за автобусите</h1>
+    <h1>📅 График и Поддръжка на Автобуси</h1>
     
     <div id="cars-container"></div>
 
     <script>
-        // 1. ТУК ВЪВЕЖДАШ ДАННИТЕ ЗА АВТОМОБИЛИТЕ
-        // Формат на датата: "ГГГГ-ММ-ДД" (Година-Месец-Ден)
+        // 1. ДАННИ ЗА ПРЕВОЗНИТЕ СРЕДСТВА
         const carsData = [
             {
                 name: "VDL Futura",
                 events: [
                     { title: "Гражданска отговорност (ГО)", date: "2027-01-10" },
-                    { title: "Годишен технически преглед (ГТП)", date: "2026-12-30" }, // Пример за наближаващо
+                    { title: "Годишен технически преглед (ГТП)", date: "2026-12-30" },
                     { title: "Договор за GPS И TOLL", date: "2027-03-31" },
-                    { title: "Лиценз за превоз ?", date: "2026-08-10" },
+                    { title: "Лиценз за превоз ?", date: "2027-03-31" },
                     { title: "Заверка на тахограф", date: "2027-01-15" },
                     { title: "Заверка на пожарогасители", date: "2026-09-30" }
-                ]
+                ],
+                maintenance: {
+                    lastChange: "2025-10-12",
+                    kilometers: "145,200 км"
+                },
+                repairs: ["Ремонт на шофьорския стъклопакет", "Дневни светлини отпред в ляво", "Задно ляво габаритно рогче"]
             },
             {
                 name: "MAN",
                 events: [
-                    { title: "Гражданска отговорност (ГО)", date: "2026-02-10" }, // Пример за изтекло
-                    { title: "Годишен технически преглед (ГТП)", date: "2026-11-20" },
+                    { title: "Гражданска отговорност (ГО)", date: "2027-01-10" },
+                    { title: "Годишен технически преглед (ГТП)", date: "2026-12-30" },
                     { title: "Договор за GPS И TOLL", date: "2027-03-31" },
-                    { title: "Лиценз за превоз", date: "2026-08-10" },
-                    { title: "Заверка на тахограф", date: "2026-08-10" },
-                    { title: "Заверка на пожарогасители", date: "2026-08-10" }
-                ]
+                    { title: "Лиценз за превоз ?", date: "2027-03-31" },
+                    { title: "Заверка на тахограф", date: "2027-01-15" },
+                    { title: "Заверка на пожарогасители", date: "2026-09-30" }
+                ],
+                maintenance: {
+                    lastChange: "2025-12-05",
+                    kilometers: "98,450 км"
+                },
+                repairs: ["След като излезе от Методи"]
             },
             {
-                name: "Mercedes Sprinter",
+                name: "MERCEDES Sprinter",
                 events: [
-                    { title: "Гражданска отговорност (ГО)", date: "2026-06-30" },
-                    { title: "Годишен технически преглед (ГТП)", date: "2026-07-15" },
+                    { title: "Гражданска отговорност (ГО)", date: "2027-01-10" },
+                    { title: "Годишен технически преглед (ГТП)", date: "2026-12-30" },
                     { title: "Договор за GPS И TOLL", date: "2027-03-31" },
-                    { title: "Лиценз за превоз", date: "2026-08-10" },
-                    { title: "Заверка на тахограф", date: "2026-08-10" },
-                    { title: "Заверка на пожарогасители", date: "2026-08-10" }
-                ]
+                    { title: "Лиценз за превоз ?", date: "2027-03-31" },
+                    { title: "Заверка на тахограф", date: "2027-01-15" },
+                    { title: "Заверка на пожарогасители", date: "2026-09-30" }
+                ],
+                maintenance: {
+                    lastChange: "2025-10-12",
+                    kilometers: "145,200 км"
+                },
+                repairs: ["Люспа на предно стъкло", "Панта на предния десен капак на багажника"]
             }
         ];
 
-        // 2. Логика за визуализация и пресмятане на дните
         const container = document.getElementById('cars-container');
-        
-        // Взимаме днешната дата и нулираме часовете, за да смятаме само точни дни
         const today = new Date();
         today.setHours(0, 0, 0, 0);
 
-        // Обхождаме всеки автомобил
         carsData.forEach(car => {
-            // Създаваме HTML елемент за картата на колата
             const carDiv = document.createElement('div');
             carDiv.className = 'car-card';
-            carDiv.innerHTML = `<h2>🚌 ${car.name}</h2>`;
 
-            // Обхождаме всяко събитие за конкретната кола
+            // --- Секция Заглавие ---
+            let htmlContent = `<h2>🚌 ${car.name}</h2>`;
+
+            // --- Секция Предстоящи Дати ---
+            htmlContent += `<h3>⏳ Срокове и Дати</h3>`;
             car.events.forEach(event => {
                 const eventDate = new Date(event.date);
-                
-                // Пресмятаме разликата в дни
                 const diffTime = eventDate - today;
                 const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-                // Определяме статуса (цвета) и текста
                 let statusClass = 'safe';
                 let statusText = `Остават ${diffDays} дни`;
 
                 if (diffDays < 0) {
                     statusClass = 'danger';
-                    statusText = `Изтекло преди ${Math.abs(diffDays)} дни!`;
-                } else if (diffDays === 0) {
-                    statusClass = 'danger';
-                    statusText = 'Изтича ДНЕС!';
+                    statusText = `ИЗТЕКЛО!`;
                 } else if (diffDays <= 14) {
                     statusClass = 'warning';
                 }
 
-                // Форматираме датата за показване (от ГГГГ-ММ-ДД към ДД.ММ.ГГГГ)
-                const displayDate = eventDate.toLocaleDateString('bg-BG');
-
-                // Добавяме събитието към картата на колата
-                carDiv.innerHTML += `
+                htmlContent += `
                     <div class="event ${statusClass}">
-                        <span><strong>${event.title}</strong> (${displayDate})</span>
+                        <span><strong>${event.title}:</strong> ${eventDate.toLocaleDateString('bg-BG')}</span>
                         <span>${statusText}</span>
-                    </div>
-                `;
+                    </div>`;
             });
 
-            // Добавяме готовата карта към главния контейнер в страницата
+            // --- Секция Масла и Филтри ---
+            htmlContent += `<h3>🛢️ Последна смяна (Масла/Филтри)</h3>`;
+            htmlContent += `
+                <div class="info-box">
+                    📅 Дата: <strong>${new Date(car.maintenance.lastChange).toLocaleDateString('bg-BG')}</strong><br>
+                    🛣️ Километри: <strong>${car.maintenance.kilometers}</strong>
+                </div>`;
+
+            // --- Секция Предстоящи Ремонти ---
+            htmlContent += `<h3>🛠️ Предстоящи Ремонти</h3>`;
+            if (car.repairs.length > 0) {
+                htmlContent += `<div class="info-box">`;
+                car.repairs.forEach(repair => {
+                    htmlContent += `<div class="repair-item">• ${repair}</div>`;
+                });
+                htmlContent += `</div>`;
+            } else {
+                htmlContent += `<div class="info-box" style="color: #27ae60;">Всичко е наред. Няма планирани ремонти.</div>`;
+            }
+
+            carDiv.innerHTML = htmlContent;
             container.appendChild(carDiv);
         });
     </script>
